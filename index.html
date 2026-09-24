@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gareeb Nawaj - Form Auto Fill</title>
+<style>
+:root{--b:#146c43;--bg:#f4f7f6;--card:#fff;--muted:#68756f}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:var(--bg);color:#17211d}
+header{background:linear-gradient(120deg,#0b6b42,#1976d2);color:#fff;padding:18px 22px}
+header h1{margin:0;font-size:22px}header p{margin:5px 0 0;opacity:.9}
+main{max-width:1180px;margin:18px auto;padding:0 14px 50px}
+.card{background:#fff;border:1px solid #dce5e1;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 4px 18px #0000000a}
+h2{font-size:18px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+label{font-size:12px;color:#44534c;display:block;margin-bottom:4px}
+input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:10px;border:1px solid #cfd9d4;border-radius:8px;background:#fff}
+textarea{min-height:68px}.span2{grid-column:span 2}.span4{grid-column:span 4}
+.forms{display:flex;gap:8px;flex-wrap:wrap}.formpick{border:1px solid #cfd9d4;border-radius:10px;padding:10px 12px;background:#fafcfa}
+button{border:0;border-radius:9px;padding:10px 14px;cursor:pointer}.primary{background:#146c43;color:#fff}.secondary{background:#e8f1ed}.danger{background:#feecec;color:#9d2424}
+.toolbar{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.toolbar>div{min-width:130px}
+#viewerWrap{display:grid;grid-template-columns:1fr 290px;gap:12px}.stage{overflow:auto;background:#d8ddda;padding:15px;border-radius:10px;min-height:500px}
+.page{position:relative;margin:0 auto 15px;background:#fff;box-shadow:0 2px 10px #0003}.page canvas{display:block}
+.overlay{position:absolute;left:0;top:0;pointer-events:none}.field{position:absolute;pointer-events:auto;white-space:nowrap;cursor:move;line-height:1}
+.field.selected{outline:1px dashed #d00;background:#fff7}.hint{font-size:12px;color:var(--muted)}
+.side{background:#fafcfa;border:1px solid #dbe5e0;border-radius:10px;padding:12px;height:max-content;position:sticky;top:10px}
+.side button{width:100%;margin-top:8px}.pill{font-size:11px;background:#eef5f2;border-radius:999px;padding:4px 8px}
+@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}.span4{grid-column:span 2}#viewerWrap{grid-template-columns:1fr}.side{position:static}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.span2,.span4{grid-column:span 1}}
+</style>
+</head>
+<body>
+<header><h1>Gareeb Nawaj - Form Auto Fill</h1><p>एक बार जानकारी भरें, जरूरी PDF चुनें, Preview करें और Download/Print करें।</p></header>
+<main>
+<section class="card">
+<h2>1. Common Details</h2>
+<div class="grid" id="common">
+<div><label>आवेदक का नाम</label><input data-k="name"></div>
+<div><label>पिता का नाम</label><input data-k="father"></div>
+<div><label>माता का नाम</label><input data-k="mother"></div>
+<div><label>पति/पत्नी का नाम</label><input data-k="spouse"></div>
+<div><label>जन्म दिनांक</label><input data-k="dob" type="date"></div>
+<div><label>जन्म स्थान</label><input data-k="birthPlace"></div>
+<div><label>उम्र</label><input data-k="age"></div>
+<div><label>मोबाइल</label><input data-k="mobile"></div>
+<div><label>आधार नंबर</label><input data-k="aadhaar"></div>
+<div><label>जनआधार नंबर</label><input data-k="janaadhaar"></div>
+<div><label>लिंग</label><select data-k="gender"><option></option><option>पुरुष</option><option>महिला</option></select></div>
+<div><label>वैवाहिक स्थिति</label><select data-k="marital"><option></option><option>विवाहित</option><option>अविवाहित</option></select></div>
+<div><label>धर्म</label><input data-k="religion"></div>
+<div><label>जाति</label><input data-k="caste"></div>
+<div><label>उपजाति / समुदाय</label><input data-k="subcaste"></div>
+<div><label>व्यवसाय</label><input data-k="occupation"></div>
+<div class="span2"><label>वर्तमान पता</label><textarea data-k="currentAddress"></textarea></div>
+<div class="span2"><label>स्थायी पता</label><textarea data-k="permanentAddress"></textarea></div>
+<div><label>गाँव / शहर</label><input data-k="village"></div>
+<div><label>तहसील</label><input data-k="tehsil"></div>
+<div><label>जिला</label><input data-k="district"></div>
+<div><label>राज्य</label><input data-k="state" value="राजस्थान"></div>
+<div><label>वार्षिक आय</label><input data-k="annualIncome"></div>
+<div><label>आय वर्ष</label><input data-k="incomeYear"></div>
+<div><label>परिवार राजस्थान में कितने वर्ष से</label><input data-k="yearsRajasthan"></div>
+<div><label>स्थान</label><input data-k="place"></div>
+<div><label>दिनांक</label><input data-k="date" type="date"></div>
+</div>
+<p class="hint">Form-specific tables/extra entries नीचे Custom Field से भी जोड़ी जा सकती हैं।</p>
+</section>
+
+<section class="card">
+<h2>2. Form चुनें</h2>
+<div class="forms">
+<label class="formpick"><input type="radio" name="form" value="income" checked> Income</label>
+<label class="formpick"><input type="radio" name="form" value="obc"> OBC</label>
+<label class="formpick"><input type="radio" name="form" value="domicile"> मूल निवास</label>
+<label class="formpick"><input type="radio" name="form" value="minority"> Minority</label>
+<label class="formpick"><input type="radio" name="form" value="scst"> SC/ST</label>
+</div>
+</section>
+
+<section class="card">
+<h2>3. PDF Preview & Text Setting</h2>
+<div class="toolbar">
+<div><label>Text Size</label><input id="fontSize" type="number" min="6" max="40" value="11"></div>
+<div><label>Text Style</label><select id="fontFamily"><option value="Helvetica">Helvetica</option><option value="TimesRoman">Times</option><option value="Courier">Courier</option></select></div>
+<div><label>Style</label><select id="fontWeight"><option value="normal">Normal</option><option value="bold">Bold</option></select></div>
+<button class="secondary" id="addField">+ Custom Field</button>
+<button class="secondary" id="saveMap">Save Setting</button>
+<button class="danger" id="clearMap">Reset Positions</button>
+</div>
+<p class="hint">Preview में किसी text को drag करके सही जगह रखें। Text चुनकर size/style बदल सकते हैं। Setting browser में save रहेगी।</p>
+<div id="viewerWrap">
+<div class="stage" id="stage"></div>
+<div class="side">
+<b>Selected field</b>
+<div id="selectedName" class="pill" style="margin:8px 0">कोई नहीं</div>
+<label>Field</label><select id="fieldKey"></select>
+<label style="margin-top:8px">Custom text</label><input id="customText" placeholder="जरूरत हो तो">
+<button class="secondary" id="applySelected">Apply</button>
+<button class="danger" id="deleteSelected">Delete selected</button>
+<hr>
+<button class="primary" id="download">Download Filled PDF</button>
+<button class="secondary" id="print">Print Filled PDF</button>
+<p class="hint">पहली बार हर form की field positions सेट करें। उसके बाद Save Setting करें।</p>
+</div>
+</div>
+</section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script type="module">
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
+const files={income:"forms/income.pdf",obc:"forms/obc.pdf",domicile:"forms/domicile.pdf",minority:"forms/minority.pdf",scst:"forms/scst.pdf"};
+const labels={name:"आवेदक नाम",father:"पिता नाम",mother:"माता नाम",spouse:"पति/पत्नी",dob:"जन्म दिनांक",birthPlace:"जन्म स्थान",age:"उम्र",mobile:"मोबाइल",aadhaar:"आधार",janaadhaar:"जनआधार",gender:"लिंग",marital:"वैवाहिक स्थिति",religion:"धर्म",caste:"जाति",subcaste:"उपजाति/समुदाय",occupation:"व्यवसाय",currentAddress:"वर्तमान पता",permanentAddress:"स्थायी पता",village:"गाँव/शहर",tehsil:"तहसील",district:"जिला",state:"राज्य",annualIncome:"वार्षिक आय",incomeYear:"आय वर्ष",yearsRajasthan:"राजस्थान निवास वर्ष",place:"स्थान",date:"दिनांक"};
+const fieldKey=document.querySelector("#fieldKey"); Object.entries(labels).forEach(([k,v])=>fieldKey.add(new Option(v,k)));
+let form="income", pdfDoc=null, pages=[], selected=null, scale=1.35;
+let maps={income:[],obc:[],domicile:[],minority:[],scst:[]};
+try{maps=Object.assign(maps,JSON.parse(localStorage.getItem("gn_form_maps")||"{}"))}catch(e){}
+const values=()=>Object.fromEntries([...document.querySelectorAll("[data-k]")].map(x=>[x.dataset.k,x.value]));
+function syncFields(){document.querySelectorAll(".field").forEach(el=>{const m=maps[form][+el.dataset.i]; el.textContent=m.custom||values()[m.key]||labels[m.key]||"Field"; el.style.fontSize=(m.size||11)*scale+"px"; el.style.fontFamily=m.family||"Arial";el.style.fontWeight=m.weight||"normal";});}
+document.querySelectorAll("[data-k]").forEach(x=>x.addEventListener("input",syncFields));
+async function render(){
+ form=document.querySelector('input[name="form"]:checked').value;
+ const bytes=await fetch(files[form]).then(r=>r.arrayBuffer()); pdfDoc=await pdfjsLib.getDocument({data:bytes}).promise;
+ const stage=document.querySelector("#stage");stage.innerHTML="";pages=[];
+ for(let p=1;p<=pdfDoc.numPages;p++){
+  const page=await pdfDoc.getPage(p), vp=page.getViewport({scale});
+  const wrap=document.createElement("div");wrap.className="page";wrap.style.width=vp.width+"px";wrap.style.height=vp.height+"px";wrap.dataset.page=p;
+  const c=document.createElement("canvas");c.width=vp.width;c.height=vp.height;wrap.append(c);
+  const ov=document.createElement("div");ov.className="overlay";ov.style.width=vp.width+"px";ov.style.height=vp.height+"px";wrap.append(ov);stage.append(wrap);
+  await page.render({canvasContext:c.getContext("2d"),viewport:vp}).promise; pages.push({page,vp,wrap,ov});
+ }
+ drawMap();
+}
+function drawMap(){pages.forEach(x=>x.ov.innerHTML=""); maps[form].forEach((m,i)=>{const pg=pages[(m.page||1)-1];if(!pg)return;const e=document.createElement("div");e.className="field";e.dataset.i=i;e.style.left=(m.x*scale)+"px";e.style.top=(m.y*scale)+"px";e.textContent=m.custom||values()[m.key]||labels[m.key]||"Field";e.style.fontSize=(m.size||11)*scale+"px";e.style.fontFamily=m.family||"Arial";e.style.fontWeight=m.weight||"normal";e.addEventListener("pointerdown",drag);e.addEventListener("click",()=>select(e));pg.ov.append(e);});}
+function select(e){document.querySelectorAll(".field").forEach(x=>x.classList.remove("selected"));e.classList.add("selected");selected=e;let m=maps[form][+e.dataset.i];fieldKey.value=m.key||"name";document.querySelector("#customText").value=m.custom||"";document.querySelector("#fontSize").value=m.size||11;document.querySelector("#fontFamily").value=m.family||"Helvetica";document.querySelector("#fontWeight").value=m.weight||"normal";document.querySelector("#selectedName").textContent=labels[m.key]||"Custom";}
+function drag(ev){select(ev.currentTarget);let e=ev.currentTarget,m=maps[form][+e.dataset.i],sx=ev.clientX,sy=ev.clientY,ox=m.x,oy=m.y;e.setPointerCapture(ev.pointerId);e.onpointermove=a=>{m.x=Math.max(0,ox+(a.clientX-sx)/scale);m.y=Math.max(0,oy+(a.clientY-sy)/scale);e.style.left=m.x*scale+"px";e.style.top=m.y*scale+"px"};e.onpointerup=()=>e.onpointermove=null;}
+document.querySelectorAll('input[name="form"]').forEach(x=>x.addEventListener("change",render));
+document.querySelector("#addField").onclick=()=>{maps[form].push({key:fieldKey.value,page:1,x:100,y:100,size:+document.querySelector("#fontSize").value,family:document.querySelector("#fontFamily").value,weight:document.querySelector("#fontWeight").value});drawMap();};
+document.querySelector("#applySelected").onclick=()=>{if(!selected)return;let m=maps[form][+selected.dataset.i];m.key=fieldKey.value;m.custom=document.querySelector("#customText").value;m.size=+document.querySelector("#fontSize").value;m.family=document.querySelector("#fontFamily").value;m.weight=document.querySelector("#fontWeight").value;drawMap();};
+document.querySelector("#deleteSelected").onclick=()=>{if(!selected)return;maps[form].splice(+selected.dataset.i,1);selected=null;drawMap();};
+document.querySelector("#saveMap").onclick=()=>{localStorage.setItem("gn_form_maps",JSON.stringify(maps));alert("Setting save हो गई");};
+document.querySelector("#clearMap").onclick=()=>{if(confirm("इस form की positions reset करें?")){maps[form]=[];drawMap();}};
+async function makePdf(){
+ const src=await fetch(files[form]).then(r=>r.arrayBuffer());const out=await PDFLib.PDFDocument.load(src);const vals=values();
+ const helv=await out.embedFont(PDFLib.StandardFonts.Helvetica), bold=await out.embedFont(PDFLib.StandardFonts.HelveticaBold);
+ for(const m of maps[form]){const pg=out.getPages()[(m.page||1)-1];if(!pg)continue;let t=m.custom||vals[m.key]||"";if(!t)continue;
+  // Standard PDF fonts reliably support Latin text/numbers. Hindi text is best used via original form labels; entered Hindi may need a Unicode font in a server version.
+  try{pg.drawText(t,{x:m.x,y:pg.getHeight()-m.y-(m.size||11),size:m.size||11,font:m.weight==="bold"?bold:helv,color:PDFLib.rgb(0,0,0)});}catch(e){pg.drawText(String(t).replace(/[^\x20-\x7E]/g,"?"),{x:m.x,y:pg.getHeight()-m.y-(m.size||11),size:m.size||11,font:m.weight==="bold"?bold:helv});}
+ }
+ return await out.save();
+}
+document.querySelector("#download").onclick=async()=>{const b=await makePdf(),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([b],{type:"application/pdf"}));a.download=form+"-filled.pdf";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);};
+document.querySelector("#print").onclick=async()=>{const b=await makePdf(),u=URL.createObjectURL(new Blob([b],{type:"application/pdf"}));window.open(u,"_blank");};
+render();
+</script>
+</body></html>
