@@ -99,7 +99,7 @@ button{border:0;border-radius:9px;padding:10px 14px;cursor:pointer}.primary{back
 <hr>
 <button class="primary" id="download">Download Filled PDF</button>
 <button class="secondary" id="print">Print Filled PDF</button>
-<p class="hint">पहली बार हर form की field positions सेट करें। उसके बाद Save Setting करें।</p>
+<p class="hint">Common fields अब पहले से रखे गए हैं। Details भरते ही Preview में text दिखेगा। जरूरत हो तो drag करके सही जगह रखें और Save Setting करें।</p>
 </div>
 </div>
 </section>
@@ -114,8 +114,15 @@ const files={income:"forms/income.pdf",obc:"forms/obc.pdf",domicile:"forms/domic
 const labels={name:"आवेदक नाम",father:"पिता नाम",mother:"माता नाम",spouse:"पति/पत्नी",dob:"जन्म दिनांक",birthPlace:"जन्म स्थान",age:"उम्र",mobile:"मोबाइल",aadhaar:"आधार",janaadhaar:"जनआधार",gender:"लिंग",marital:"वैवाहिक स्थिति",religion:"धर्म",caste:"जाति",subcaste:"उपजाति/समुदाय",occupation:"व्यवसाय",currentAddress:"वर्तमान पता",permanentAddress:"स्थायी पता",village:"गाँव/शहर",tehsil:"तहसील",district:"जिला",state:"राज्य",annualIncome:"वार्षिक आय",incomeYear:"आय वर्ष",yearsRajasthan:"राजस्थान निवास वर्ष",place:"स्थान",date:"दिनांक"};
 const fieldKey=document.querySelector("#fieldKey"); Object.entries(labels).forEach(([k,v])=>fieldKey.add(new Option(v,k)));
 let form="income", pdfDoc=null, pages=[], selected=null, scale=1.35;
-let maps={income:[],obc:[],domicile:[],minority:[],scst:[]};
-try{maps=Object.assign(maps,JSON.parse(localStorage.getItem("gn_form_maps")||"{}"))}catch(e){}
+const starter={
+ income:[{key:"name",page:1,x:165,y:111,size:11},{key:"father",page:1,x:165,y:139,size:11},{key:"currentAddress",page:1,x:165,y:178,size:10},{key:"permanentAddress",page:1,x:165,y:204,size:10},{key:"village",page:1,x:165,y:235,size:10},{key:"tehsil",page:1,x:330,y:235,size:10},{key:"district",page:1,x:455,y:235,size:10},{key:"dob",page:1,x:165,y:263,size:10},{key:"birthPlace",page:1,x:330,y:263,size:10},{key:"age",page:1,x:510,y:263,size:10},{key:"religion",page:1,x:165,y:318,size:10},{key:"caste",page:1,x:330,y:318,size:10},{key:"subcaste",page:1,x:455,y:318,size:10},{key:"mobile",page:1,x:165,y:397,size:10},{key:"date",page:1,x:155,y:655,size:10},{key:"place",page:1,x:155,y:680,size:10}],
+ obc:[{key:"name",page:1,x:175,y:125,size:11},{key:"father",page:1,x:175,y:153,size:11},{key:"dob",page:1,x:175,y:182,size:10},{key:"currentAddress",page:1,x:175,y:220,size:10},{key:"religion",page:1,x:175,y:285,size:10},{key:"caste",page:1,x:350,y:285,size:10},{key:"subcaste",page:1,x:470,y:285,size:10},{key:"mobile",page:1,x:175,y:420,size:10}],
+ domicile:[{key:"aadhaar",page:1,x:185,y:120,size:10},{key:"janaadhaar",page:1,x:185,y:145,size:10},{key:"name",page:1,x:185,y:175,size:11},{key:"father",page:1,x:185,y:205,size:11},{key:"currentAddress",page:1,x:185,y:245,size:10},{key:"dob",page:1,x:185,y:315,size:10},{key:"birthPlace",page:1,x:350,y:315,size:10},{key:"mobile",page:1,x:185,y:430,size:10}],
+ minority:[{key:"aadhaar",page:1,x:180,y:125,size:10},{key:"janaadhaar",page:1,x:180,y:150,size:10},{key:"name",page:1,x:180,y:180,size:11},{key:"father",page:1,x:180,y:210,size:11},{key:"currentAddress",page:1,x:180,y:250,size:10},{key:"dob",page:1,x:180,y:315,size:10},{key:"subcaste",page:1,x:180,y:370,size:10},{key:"mobile",page:1,x:180,y:425,size:10}],
+ scst:[{key:"name",page:1,x:180,y:125,size:11},{key:"father",page:1,x:180,y:155,size:11},{key:"mother",page:1,x:180,y:185,size:11},{key:"currentAddress",page:1,x:180,y:225,size:10},{key:"dob",page:1,x:180,y:295,size:10},{key:"religion",page:1,x:180,y:350,size:10},{key:"caste",page:1,x:340,y:350,size:10},{key:"subcaste",page:1,x:465,y:350,size:10},{key:"mobile",page:1,x:180,y:430,size:10}]
+};
+let maps=JSON.parse(JSON.stringify(starter));
+try{const saved=JSON.parse(localStorage.getItem("gn_form_maps")||"{}");for(const k of Object.keys(maps)){if(saved[k]&&saved[k].length)maps[k]=saved[k]}}catch(e){}
 const values=()=>Object.fromEntries([...document.querySelectorAll("[data-k]")].map(x=>[x.dataset.k,x.value]));
 function syncFields(){document.querySelectorAll(".field").forEach(el=>{const m=maps[form][+el.dataset.i]; el.textContent=m.custom||values()[m.key]||labels[m.key]||"Field"; el.style.fontSize=(m.size||11)*scale+"px"; el.style.fontFamily=m.family||"Arial";el.style.fontWeight=m.weight||"normal";});}
 document.querySelectorAll("[data-k]").forEach(x=>x.addEventListener("input",syncFields));
@@ -140,7 +147,7 @@ document.querySelector("#addField").onclick=()=>{maps[form].push({key:fieldKey.v
 document.querySelector("#applySelected").onclick=()=>{if(!selected)return;let m=maps[form][+selected.dataset.i];m.key=fieldKey.value;m.custom=document.querySelector("#customText").value;m.size=+document.querySelector("#fontSize").value;m.family=document.querySelector("#fontFamily").value;m.weight=document.querySelector("#fontWeight").value;drawMap();};
 document.querySelector("#deleteSelected").onclick=()=>{if(!selected)return;maps[form].splice(+selected.dataset.i,1);selected=null;drawMap();};
 document.querySelector("#saveMap").onclick=()=>{localStorage.setItem("gn_form_maps",JSON.stringify(maps));alert("Setting save हो गई");};
-document.querySelector("#clearMap").onclick=()=>{if(confirm("इस form की positions reset करें?")){maps[form]=[];drawMap();}};
+document.querySelector("#clearMap").onclick=()=>{if(confirm("इस form की positions default पर reset करें?")){maps[form]=JSON.parse(JSON.stringify(starter[form]));localStorage.setItem("gn_form_maps",JSON.stringify(maps));drawMap();}};
 async function makePdf(){
  const src=await fetch(files[form]).then(r=>r.arrayBuffer());const out=await PDFLib.PDFDocument.load(src);const vals=values();
  const helv=await out.embedFont(PDFLib.StandardFonts.Helvetica), bold=await out.embedFont(PDFLib.StandardFonts.HelveticaBold);
